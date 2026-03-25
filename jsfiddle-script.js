@@ -69,9 +69,10 @@ function handleQuickPlay() {
 }
 
 /**
- * Picks a random room with available slots.
- * Filters for visible rooms with at least one human player
- * and open spots remaining.
+ * Picks a random room likely still waiting for players.
+ * Filters for visible rooms with 1-2 players (fewer players =
+ * less likely the game has already started by the time we arrive).
+ * Falls back to any room with open slots if none found.
  *
  * @param {Array} rooms - Room list from /api/room-list.json
  * @returns {Object|null} Selected room, or null if none found
@@ -79,19 +80,22 @@ function handleQuickPlay() {
 function pickJoinableRoom(rooms) {
   if (!rooms || !rooms.length) return null;
 
-  var joinable = rooms.filter(function (room) {
+  var open = rooms.filter(function (room) {
     if (!room.visible) return false;
     if (room.players.length >= room.maxPlayers) return false;
-    var hasHuman = room.players.some(function (p) {
-      return !p.isBot;
-    });
-    return hasHuman;
+    return room.players.some(function (p) { return !p.isBot; });
   });
 
-  console.log('[QuickPlay] Found ' + joinable.length + ' joinable rooms');
-  if (!joinable.length) return null;
+  // Prefer rooms with 1-2 players — more likely still in lobby
+  var fewPlayers = open.filter(function (room) {
+    return room.players.length <= 2;
+  });
 
-  return joinable[Math.floor(Math.random() * joinable.length)];
+  var pool = fewPlayers.length > 0 ? fewPlayers : open;
+  console.log('[QuickPlay] Found ' + pool.length + ' joinable rooms (' + fewPlayers.length + ' with 1-2 players)');
+  if (!pool.length) return null;
+
+  return pool[Math.floor(Math.random() * pool.length)];
 }
 
 /**

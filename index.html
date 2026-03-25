@@ -234,19 +234,21 @@
     function pickJoinableRoom(rooms) {
       if (!rooms || !rooms.length) return null;
 
-      var joinable = rooms.filter(function (room) {
+      var open = rooms.filter(function (room) {
         if (!room.visible) return false;
         if (room.players.length >= room.maxPlayers) return false;
-        var hasHuman = room.players.some(function (p) {
-          return !p.isBot;
-        });
-        return hasHuman;
+        return room.players.some(function (p) { return !p.isBot; });
       });
 
-      console.log('[QuickPlay] Found ' + joinable.length + ' joinable rooms');
-      if (!joinable.length) return null;
+      var fewPlayers = open.filter(function (room) {
+        return room.players.length <= 2;
+      });
 
-      return joinable[Math.floor(Math.random() * joinable.length)];
+      var pool = fewPlayers.length > 0 ? fewPlayers : open;
+      console.log('[QuickPlay] Found ' + pool.length + ' joinable rooms (' + fewPlayers.length + ' with 1-2 players)');
+      if (!pool.length) return null;
+
+      return pool[Math.floor(Math.random() * pool.length)];
     }
 
     function handleWatchLive() {
