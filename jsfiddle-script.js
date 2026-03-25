@@ -1,5 +1,5 @@
 var COLONIST_API = 'https://colonist.io/api';
-var CORS_PROXY = 'https://corsproxy.io/?url=' + encodeURIComponent(COLONIST_API);
+var CORS_PROXY = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(COLONIST_API);
 
 /**
  * Fetches a Colonist API endpoint. Tries the direct URL first

@@ -182,7 +182,7 @@
 
   <script>
     var COLONIST_API = 'https://colonist.io/api';
-    var CORS_PROXY = 'https://corsproxy.io/?url=' + encodeURIComponent(COLONIST_API);
+    var CORS_PROXY = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(COLONIST_API);
 
     function fetchAPI(path) {
       return fetch(COLONIST_API + path).catch(function () {
