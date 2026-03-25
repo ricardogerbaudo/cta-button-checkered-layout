@@ -40,17 +40,28 @@ function generateRoomCode(length) {
 
 /**
  * Button 1 (Top Left) - Quick Play.
- * Fetches the room list and joins a random room with available slots.
+ * Fetches both room-list and game-list, cross-references them to
+ * exclude rooms where the game already started, then joins a room
+ * that's genuinely waiting for players.
  * Fallback: creates a new room with a random code.
  */
 function handleQuickPlay() {
-  console.log('[QuickPlay] Fetching room list...');
+  console.log('[QuickPlay] Fetching room list and game list...');
 
-  fetchAPI('/room-list.json')
-    .then(function (response) { return response.json(); })
-    .then(function (data) {
-      console.log('[QuickPlay] Received ' + data.rooms.length + ' rooms');
-      var room = pickJoinableRoom(data.rooms);
+  Promise.all([
+    fetchAPI('/room-list.json').then(function (r) { return r.json(); }),
+    fetchAPI('/game-list.json').then(function (r) { return r.json(); })
+  ])
+    .then(function (results) {
+      var rooms = results[0].rooms;
+      var games = results[1].games;
+
+      // Build a set of game IDs (already started)
+      var activeGameIds = {};
+      games.forEach(function (g) { activeGameIds[g.id] = true; });
+
+      console.log('[QuickPlay] Received ' + rooms.length + ' rooms, ' + games.length + ' active games');
+      var room = pickJoinableRoom(rooms, activeGameIds);
 
       if (room) {
         console.log('[QuickPlay] Joining room: ' + room.id + ' (' + room.players.length + '/' + room.maxPlayers + ' players)');
@@ -69,20 +80,21 @@ function handleQuickPlay() {
 }
 
 /**
- * Picks a random room likely still waiting for players.
- * Filters for visible rooms with 1-2 players (fewer players =
- * less likely the game has already started by the time we arrive).
- * Falls back to any room with open slots if none found.
+ * Picks a random room that's genuinely waiting for players.
+ * Excludes rooms whose IDs appear in the active game list (already started).
+ * Prefers rooms with 1-2 players as an extra safety check.
  *
  * @param {Array} rooms - Room list from /api/room-list.json
+ * @param {Object} activeGameIds - Map of game IDs that are already in progress
  * @returns {Object|null} Selected room, or null if none found
  */
-function pickJoinableRoom(rooms) {
+function pickJoinableRoom(rooms, activeGameIds) {
   if (!rooms || !rooms.length) return null;
 
   var open = rooms.filter(function (room) {
     if (!room.visible) return false;
     if (room.players.length >= room.maxPlayers) return false;
+    if (activeGameIds[room.id]) return false; // game already started
     return room.players.some(function (p) { return !p.isBot; });
   });
 
@@ -92,7 +104,7 @@ function pickJoinableRoom(rooms) {
   });
 
   var pool = fewPlayers.length > 0 ? fewPlayers : open;
-  console.log('[QuickPlay] Found ' + pool.length + ' joinable rooms (' + fewPlayers.length + ' with 1-2 players)');
+  console.log('[QuickPlay] Found ' + pool.length + ' joinable rooms (' + fewPlayers.length + ' with 1-2 players, excluded ' + Object.keys(activeGameIds).length + ' active games)');
   if (!pool.length) return null;
 
   return pool[Math.floor(Math.random() * pool.length)];

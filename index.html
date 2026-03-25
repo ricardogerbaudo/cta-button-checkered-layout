@@ -207,13 +207,21 @@
     }
 
     function handleQuickPlay() {
-      console.log('[QuickPlay] Fetching room list...');
+      console.log('[QuickPlay] Fetching room list and game list...');
 
-      fetchAPI('/room-list.json')
-        .then(function (response) { return response.json(); })
-        .then(function (data) {
-          console.log('[QuickPlay] Received ' + data.rooms.length + ' rooms');
-          var room = pickJoinableRoom(data.rooms);
+      Promise.all([
+        fetchAPI('/room-list.json').then(function (r) { return r.json(); }),
+        fetchAPI('/game-list.json').then(function (r) { return r.json(); })
+      ])
+        .then(function (results) {
+          var rooms = results[0].rooms;
+          var games = results[1].games;
+
+          var activeGameIds = {};
+          games.forEach(function (g) { activeGameIds[g.id] = true; });
+
+          console.log('[QuickPlay] Received ' + rooms.length + ' rooms, ' + games.length + ' active games');
+          var room = pickJoinableRoom(rooms, activeGameIds);
 
           if (room) {
             console.log('[QuickPlay] Joining room: ' + room.id + ' (' + room.players.length + '/' + room.maxPlayers + ' players)');
@@ -231,12 +239,13 @@
         });
     }
 
-    function pickJoinableRoom(rooms) {
+    function pickJoinableRoom(rooms, activeGameIds) {
       if (!rooms || !rooms.length) return null;
 
       var open = rooms.filter(function (room) {
         if (!room.visible) return false;
         if (room.players.length >= room.maxPlayers) return false;
+        if (activeGameIds[room.id]) return false;
         return room.players.some(function (p) { return !p.isBot; });
       });
 
@@ -245,7 +254,7 @@
       });
 
       var pool = fewPlayers.length > 0 ? fewPlayers : open;
-      console.log('[QuickPlay] Found ' + pool.length + ' joinable rooms (' + fewPlayers.length + ' with 1-2 players)');
+      console.log('[QuickPlay] Found ' + pool.length + ' joinable rooms (' + fewPlayers.length + ' with 1-2 players, excluded ' + Object.keys(activeGameIds).length + ' active games)');
       if (!pool.length) return null;
 
       return pool[Math.floor(Math.random() * pool.length)];
