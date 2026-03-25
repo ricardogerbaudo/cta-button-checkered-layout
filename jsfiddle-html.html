@@ -55,24 +55,15 @@
      - Watch Live uses /api/game-list.json (active games in progress).
        Picks a random game with 2+ human players to spectate.
        Fallback: redirects to the lobby page.
-     - CORS: The APIs don't set Access-Control-Allow-Origin headers, so
-       cross-origin fetches (e.g., from JSFiddle) fail. fetchAPI() tries
-       the direct URL first (works on colonist.io), then retries through
-       a CORS proxy (allorigins.win) as fallback for cross-origin contexts.
      - I discovered these APIs by probing endpoints and inspecting the
        Spectate tab's navigation behavior (colonist.io/#gameId).
 
-  6. JSFIDDLE LIMITATIONS & LIVE DEMO:
-     - API calls work from JSFiddle via CORS proxy (verified).
-     - Navigation to colonist.io/#roomId requires authentication.
-       Since JSFiddle runs in a sandboxed iframe, Google OAuth popups
-       are blocked, so the user can't log in after being redirected.
-     - This is a non-issue in production: the A/B test runs on
-       colonist.io where users are already authenticated.
-     - To demonstrate full end-to-end functionality (API fetch, room
-       selection, and navigation to colonist.io), I deployed a GitHub
-       Pages version that runs outside the iframe sandbox:
-       https://ricardogerbaudo.github.io/cta-button-checkered-layout/
+  6. CORS HANDLING:
+     - The colonist.io APIs don't set Access-Control-Allow-Origin headers.
+     - fetchAPI() tries the direct URL first (works on colonist.io),
+       then retries via allorigins.win proxy for cross-origin contexts.
+     - Both buttons are fully testable from JSFiddle: API calls succeed
+       via proxy, and window.open navigates to colonist.io in a new tab.
 
   7. HOVER — Scale + glow + brightness, three complementary effects:
      - Hover: scale(1.03), colored box-shadow, brightness(1.08)
