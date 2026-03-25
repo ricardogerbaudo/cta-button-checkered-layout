@@ -61,13 +61,17 @@
      - I discovered these APIs by probing endpoints and inspecting the
        Spectate tab's navigation behavior (colonist.io/#gameId).
 
-  6. JSFIDDLE LIMITATIONS:
+  6. JSFIDDLE LIMITATIONS & LIVE DEMO:
      - API calls work from JSFiddle via CORS proxy (verified).
      - Navigation to colonist.io/#roomId requires authentication.
        Since JSFiddle runs in a sandboxed iframe, Google OAuth popups
        are blocked, so the user can't log in after being redirected.
      - This is a non-issue in production: the A/B test runs on
        colonist.io where users are already authenticated.
+     - To demonstrate full end-to-end functionality (API fetch, room
+       selection, and navigation to colonist.io), I deployed a GitHub
+       Pages version that runs outside the iframe sandbox:
+       https://ricardogerbaudo.github.io/cta-button-checkered-layout/
 
   7. HOVER — Scale + glow + brightness, three complementary effects:
      - Hover: scale(1.03), colored box-shadow, brightness(1.08)
