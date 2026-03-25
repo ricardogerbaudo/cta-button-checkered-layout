@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Colonist - Checkered CTA Layout</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap">
+  <link rel="stylesheet" href="https://use.typekit.net/dfe0lwq.css">
+
+  <!--
+    LOCAL PREVIEW FILE
+    ==================
+    This file compiles the SCSS to CSS for local browser testing.
+    The actual submission is a JSFiddle link with three panels:
+      - HTML panel:  jsfiddle-html.html
+      - SCSS panel:  jsfiddle-style.scss
+      - JS panel:    jsfiddle-script.js
+
+    NOTE: The <style> block below is the compiled CSS equivalent of
+    jsfiddle-style.scss. For the actual SCSS source, see that file.
+  -->
+
+  <style>
+    body {
+      background: #1062b0;
+      font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      color: #ffffff;
+    }
+
+    /* CTA Grid - Checkered Layout */
+    .cta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 16px;
+      max-width: 1016px;
+      margin: 0 auto;
+    }
+
+    /* CTA Buttons (anchor elements) */
+    .cta-button {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      max-width: 500px;
+      aspect-ratio: 5.5 / 1;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      color: #ffffff;
+      font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+      padding: 0;
+      outline: none;
+      -webkit-tap-highlight-color: transparent;
+      transition:
+        transform 0.2s ease-out,
+        box-shadow 0.2s ease-out,
+        filter 0.2s ease-out;
+    }
+
+    .cta-button__title {
+      font-family: 'madcap', 'Open Sans', Helvetica, Arial, sans-serif;
+      font-size: clamp(16px, 3vw, 22px);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      line-height: 1.2;
+    }
+
+    .cta-button__subtitle {
+      font-size: clamp(10px, 1.8vw, 13px);
+      font-weight: 400;
+      opacity: 0.85;
+      margin-top: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    /* Primary (Orange) - Top Left */
+    .cta-button--primary {
+      grid-column: 1;
+      grid-row: 1;
+      background: linear-gradient(to bottom, #f2b80c, #f88835);
+    }
+
+    .cta-button--primary:hover {
+      transform: scale(1.03);
+      box-shadow: 0 4px 20px rgba(241, 90, 36, 0.4);
+      filter: brightness(1.08);
+    }
+
+    .cta-button--primary:active {
+      transform: scale(0.98);
+    }
+
+    .cta-button--primary:focus-visible {
+      outline: 2px solid #ffffff;
+      outline-offset: 3px;
+    }
+
+    /* Secondary (Green) - Bottom Right */
+    .cta-button--secondary {
+      grid-column: 2;
+      grid-row: 2;
+      background: linear-gradient(to bottom, #55de01, #51c10d);
+    }
+
+    .cta-button--secondary:hover {
+      transform: scale(1.03);
+      box-shadow: 0 4px 20px rgba(76, 173, 42, 0.4);
+      filter: brightness(1.08);
+    }
+
+    .cta-button--secondary:active {
+      transform: scale(0.98);
+    }
+
+    .cta-button--secondary:focus-visible {
+      outline: 2px solid #ffffff;
+      outline-offset: 3px;
+    }
+
+    /* Responsive: Small screens */
+    @media (max-width: 700px) {
+      .cta-grid {
+        grid-template-columns: 1fr;
+        max-width: 500px;
+      }
+
+      .cta-button {
+        max-width: 85%;
+      }
+
+      .cta-button--primary {
+        grid-column: 1;
+        grid-row: 1;
+        justify-self: start;
+      }
+
+      .cta-button--secondary {
+        grid-column: 1;
+        grid-row: 2;
+        justify-self: end;
+      }
+    }
+
+    /* Responsive: Very narrow */
+    @media (max-width: 400px) {
+      .cta-button {
+        max-width: 100%;
+      }
+
+      .cta-button--primary,
+      .cta-button--secondary {
+        justify-self: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="cta-grid">
+    <button class="cta-button cta-button--primary" onclick="handleQuickPlay()">
+      <span class="cta-button__title">Quick Play</span>
+      <span class="cta-button__subtitle">Jump into a game against other players with a click!</span>
+    </button>
+    <button class="cta-button cta-button--secondary" onclick="handleWatchLive()">
+      <span class="cta-button__title">Watch Live</span>
+      <span class="cta-button__subtitle">Spectate top-ranked matches in real time</span>
+    </button>
+  </div>
+
+  <script>
+    var COLONIST_API = 'https://colonist.io/api';
+    var CORS_PROXY = 'https://corsproxy.io/?url=' + encodeURIComponent(COLONIST_API);
+
+    function fetchAPI(path) {
+      return fetch(COLONIST_API + path).catch(function () {
+        console.log('[API] Direct fetch failed (CORS). Retrying via proxy...');
+        return fetch(CORS_PROXY + encodeURIComponent(path));
+      }).then(function (response) {
+        if (!response.ok) throw new Error(response.status);
+        return response;
+      });
+    }
+
+    function generateRoomCode(length) {
+      length = length || 4;
+      var chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+      var code = '';
+
+      for (var i = 0; i < length; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+
+      return code;
+    }
+
+    function handleQuickPlay() {
+      console.log('[QuickPlay] Fetching room list...');
+
+      fetchAPI('/room-list.json')
+        .then(function (response) { return response.json(); })
+        .then(function (data) {
+          console.log('[QuickPlay] Received ' + data.rooms.length + ' rooms');
+          var room = pickJoinableRoom(data.rooms);
+
+          if (room) {
+            console.log('[QuickPlay] Joining room: ' + room.id + ' (' + room.players.length + '/' + room.maxPlayers + ' players)');
+            window.location.href = 'https://colonist.io/#' + room.id;
+          } else {
+            var code = generateRoomCode();
+            console.log('[QuickPlay] No joinable rooms found. Creating new room: ' + code);
+            window.location.href = 'https://colonist.io/#' + code;
+          }
+        })
+        .catch(function (err) {
+          var code = generateRoomCode();
+          console.log('[QuickPlay] Fetch failed (' + err.message + '). Creating new room: ' + code);
+          window.location.href = 'https://colonist.io/#' + code;
+        });
+    }
+
+    function pickJoinableRoom(rooms) {
+      if (!rooms || !rooms.length) return null;
+
+      var joinable = rooms.filter(function (room) {
+        if (!room.visible) return false;
+        if (room.players.length >= room.maxPlayers) return false;
+        var hasHuman = room.players.some(function (p) {
+          return !p.isBot;
+        });
+        return hasHuman;
+      });
+
+      console.log('[QuickPlay] Found ' + joinable.length + ' joinable rooms');
+      if (!joinable.length) return null;
+
+      return joinable[Math.floor(Math.random() * joinable.length)];
+    }
+
+    function handleWatchLive() {
+      console.log('[WatchLive] Fetching game list...');
+
+      fetchAPI('/game-list.json')
+        .then(function (response) { return response.json(); })
+        .then(function (data) {
+          console.log('[WatchLive] Received ' + data.games.length + ' active games');
+          var game = pickSpectateGame(data.games);
+
+          if (game) {
+            console.log('[WatchLive] Spectating game: ' + game.id + ' (' + game.players.length + ' players)');
+            window.location.href = 'https://colonist.io/#' + game.id;
+          } else {
+            console.log('[WatchLive] No spectatable games. Redirecting to lobby.');
+            window.location.href = 'https://colonist.io/#lobby';
+          }
+        })
+        .catch(function (err) {
+          console.log('[WatchLive] Fetch failed (' + err.message + '). Redirecting to lobby.');
+          window.location.href = 'https://colonist.io/#lobby';
+        });
+    }
+
+    function pickSpectateGame(games) {
+      if (!games || !games.length) return null;
+
+      var spectatable = games.filter(function (game) {
+        var humanCount = game.players.filter(function (p) {
+          return !p.isBot;
+        }).length;
+        return humanCount >= 2;
+      });
+
+      console.log('[WatchLive] Found ' + spectatable.length + ' spectatable games');
+      if (!spectatable.length) return null;
+
+      return spectatable[Math.floor(Math.random() * spectatable.length)];
+    }
+  </script>
+</body>
+
+</html>

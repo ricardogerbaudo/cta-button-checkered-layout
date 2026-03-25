@@ -1,0 +1,192 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');
+@import url('https://use.typekit.net/dfe0lwq.css');
+
+// ===========================================
+// Variables
+// ===========================================
+
+// Colors
+$orange-start: #f2b80c;
+$orange-end: #f88835;
+$orange-glow: rgba(241, 90, 36, 0.4);
+
+$green-start: #55de01;
+$green-end: #51c10d;
+$green-glow: rgba(76, 173, 42, 0.4);
+
+$page-bg: #1062b0;
+$text-color: #ffffff;
+$subtitle-opacity: 0.85;
+
+// Fonts
+$font-stack: 'Open Sans', Helvetica, Arial, sans-serif;
+$font-title: 'madcap', $font-stack;
+
+// CTA Button Layout
+$button-max-width: 500px;
+$button-aspect-ratio: 5.5 / 1;
+$button-border-radius: 20px;
+$grid-gap: 16px;
+
+// Animation
+$transition-speed: 0.2s;
+$transition-easing: ease-out;
+$hover-scale: 1.03;
+
+// ===========================================
+// Base
+// ===========================================
+
+body {
+  background: $page-bg;
+  font-family: $font-stack;
+  margin: 0;
+  padding: 20px;
+  color: $text-color;
+}
+
+// ===========================================
+// Grid - Checkered Layout
+// ===========================================
+
+.cta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: $grid-gap;
+  max-width: calc(#{$button-max-width} * 2 + #{$grid-gap});
+  margin: 0 auto;
+}
+
+// ===========================================
+// CTA Buttons (anchor elements)
+// ===========================================
+
+.cta-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: $button-max-width;
+  aspect-ratio: $button-aspect-ratio;
+  border: none;
+  border-radius: $button-border-radius;
+  cursor: pointer;
+  color: $text-color;
+  font-family: $font-stack;
+  padding: 0;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform $transition-speed $transition-easing,
+    box-shadow $transition-speed $transition-easing,
+    filter $transition-speed $transition-easing;
+
+  // Title text (e.g., "QUICK PLAY") — uses Madcap from Adobe Fonts
+  &__title {
+    font-family: $font-title;
+    font-size: clamp(16px, 3vw, 22px);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    line-height: 1.2;
+  }
+
+  // Subtitle text (e.g., "Jump into a game...")
+  &__subtitle {
+    font-size: clamp(10px, 1.8vw, 13px);
+    font-weight: 400;
+    opacity: $subtitle-opacity;
+    margin-top: 4px;
+    letter-spacing: 0.5px;
+  }
+
+  // ---------------------
+  // Primary (Orange) - Top Left
+  // ---------------------
+  &--primary {
+    grid-column: 1;
+    grid-row: 1;
+    background: linear-gradient(to bottom, $orange-start, $orange-end);
+
+    &:hover {
+      transform: scale($hover-scale);
+      box-shadow: 0 4px 20px $orange-glow;
+      filter: brightness(1.08);
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+
+    &:focus-visible {
+      outline: 2px solid $text-color;
+      outline-offset: 3px;
+    }
+  }
+
+  // ---------------------
+  // Secondary (Green) - Bottom Right
+  // ---------------------
+  &--secondary {
+    grid-column: 2;
+    grid-row: 2;
+    background: linear-gradient(to bottom, $green-start, $green-end);
+
+    &:hover {
+      transform: scale($hover-scale);
+      box-shadow: 0 4px 20px $green-glow;
+      filter: brightness(1.08);
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+
+    &:focus-visible {
+      outline: 2px solid $text-color;
+      outline-offset: 3px;
+    }
+  }
+}
+
+// ===========================================
+// Responsive
+// ===========================================
+
+// Small screens: single column CTA, staggered alignment
+@media (max-width: 700px) {
+  .cta-grid {
+    grid-template-columns: 1fr;
+    max-width: $button-max-width;
+  }
+
+  .cta-button {
+    max-width: 85%;
+
+    &--primary {
+      grid-column: 1;
+      grid-row: 1;
+      justify-self: start;
+    }
+
+    &--secondary {
+      grid-column: 1;
+      grid-row: 2;
+      justify-self: end;
+    }
+  }
+}
+
+// Very narrow screens: center both buttons, full width
+@media (max-width: 400px) {
+  .cta-button {
+    max-width: 100%;
+
+    &--primary,
+    &--secondary {
+      justify-self: center;
+    }
+  }
+}
