@@ -127,7 +127,9 @@ function handleWatchLive() {
 
 /**
  * Picks a random active game suitable for spectating.
- * Filters for games with at least 2 human players.
+ * Filters for games with 4+ players (likely full/in-progress).
+ * Full games auto-enter spectate mode on colonist.io.
+ * Falls back to 3+ players if no 4-player games exist.
  *
  * @param {Array} games - Game list from /api/game-list.json
  * @returns {Object|null} Selected game, or null if none found
@@ -135,15 +137,27 @@ function handleWatchLive() {
 function pickSpectateGame(games) {
   if (!games || !games.length) return null;
 
-  var spectatable = games.filter(function (game) {
-    var humanCount = game.players.filter(function (p) {
-      return !p.isBot;
-    }).length;
-    return humanCount >= 2;
+  var fourPlus = games.filter(function (game) {
+    return game.players.length >= 4 && hasHumans(game, 2);
   });
 
-  console.log('[WatchLive] Found ' + spectatable.length + ' spectatable games');
-  if (!spectatable.length) return null;
+  var threePlus = fourPlus.length > 0 ? fourPlus : games.filter(function (game) {
+    return game.players.length >= 3 && hasHumans(game, 2);
+  });
 
-  return spectatable[Math.floor(Math.random() * spectatable.length)];
+  var pool = threePlus;
+  console.log('[WatchLive] Found ' + pool.length + ' spectatable games (' + fourPlus.length + ' with 4+ players)');
+  if (!pool.length) return null;
+
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+/**
+ * Checks if a game has at least `min` human players.
+ */
+function hasHumans(game, min) {
+  var count = game.players.filter(function (p) {
+    return !p.isBot;
+  }).length;
+  return count >= min;
 }
