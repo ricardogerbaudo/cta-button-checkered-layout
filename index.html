@@ -217,17 +217,17 @@
 
           if (room) {
             console.log('[QuickPlay] Joining room: ' + room.id + ' (' + room.players.length + '/' + room.maxPlayers + ' players)');
-            window.location.href = 'https://colonist.io/#' + room.id;
+            window.open('https://colonist.io/#' + room.id, '_blank');
           } else {
             var code = generateRoomCode();
             console.log('[QuickPlay] No joinable rooms found. Creating new room: ' + code);
-            window.location.href = 'https://colonist.io/#' + code;
+            window.open('https://colonist.io/#' + code, '_blank');
           }
         })
         .catch(function (err) {
           var code = generateRoomCode();
           console.log('[QuickPlay] Fetch failed (' + err.message + '). Creating new room: ' + code);
-          window.location.href = 'https://colonist.io/#' + code;
+          window.open('https://colonist.io/#' + code, '_blank');
         });
     }
 
@@ -260,15 +260,15 @@
 
           if (game) {
             console.log('[WatchLive] Spectating game: ' + game.id + ' (' + game.players.length + ' players)');
-            window.location.href = 'https://colonist.io/#' + game.id;
+            window.open('https://colonist.io/#' + game.id, '_blank');
           } else {
             console.log('[WatchLive] No spectatable games. Redirecting to lobby.');
-            window.location.href = 'https://colonist.io/#lobby';
+            window.open('https://colonist.io/#lobby', '_blank');
           }
         })
         .catch(function (err) {
           console.log('[WatchLive] Fetch failed (' + err.message + '). Redirecting to lobby.');
-          window.location.href = 'https://colonist.io/#lobby';
+          window.open('https://colonist.io/#lobby', '_blank');
         });
     }
 
