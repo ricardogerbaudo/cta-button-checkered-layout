@@ -43,6 +43,11 @@ body {
   margin: 0;
   padding: 20px;
   color: $text-color;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
 }
 
 // ===========================================
@@ -54,8 +59,8 @@ body {
   grid-template-columns: 1fr 1fr;
   grid-template-rows: auto auto;
   gap: $grid-gap;
+  width: 100%;
   max-width: calc(#{$button-max-width} * 2 + #{$grid-gap});
-  margin: 0 auto;
 }
 
 // ===========================================

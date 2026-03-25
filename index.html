@@ -28,6 +28,11 @@
       margin: 0;
       padding: 20px;
       color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
     }
 
     /* CTA Grid - Checkered Layout */
@@ -36,8 +41,8 @@
       grid-template-columns: 1fr 1fr;
       grid-template-rows: auto auto;
       gap: 16px;
+      width: 100%;
       max-width: 1016px;
-      margin: 0 auto;
     }
 
     /* CTA Buttons (anchor elements) */
@@ -167,11 +172,11 @@
   <div class="cta-grid">
     <button class="cta-button cta-button--primary" onclick="handleQuickPlay()">
       <span class="cta-button__title">Quick Play</span>
-      <span class="cta-button__subtitle">Jump into a game against other players with a click!</span>
+      <span class="cta-button__subtitle">Join a room with other players now!</span>
     </button>
     <button class="cta-button cta-button--secondary" onclick="handleWatchLive()">
       <span class="cta-button__title">Watch Live</span>
-      <span class="cta-button__subtitle">Spectate top-ranked matches in real time</span>
+      <span class="cta-button__subtitle">Spectate a match in real time</span>
     </button>
   </div>
 
